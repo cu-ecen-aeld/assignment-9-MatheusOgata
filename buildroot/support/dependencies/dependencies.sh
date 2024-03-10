@@ -46,6 +46,15 @@ case ":${PATH:-unset}:" in
 	;;
 esac
 
+if test -n "$PERL_MM_OPT" ; then
+	echo
+	echo "You have PERL_MM_OPT defined because Perl local::lib"
+	echo "is installed on your system. Please unset this variable"
+	echo "before starting Buildroot, otherwise the compilation of"
+	echo "Perl related packages will fail"
+	exit 1
+fi
+
 check_prog_host()
 {
 	prog="$1"
@@ -280,11 +289,6 @@ required_perl_modules="$required_perl_modules English" # Used by host-libxml-par
 required_perl_modules="$required_perl_modules ExtUtils::MakeMaker" # Used by host-libxml-parser-perl
 required_perl_modules="$required_perl_modules Thread::Queue" # Used by host-automake
 required_perl_modules="$required_perl_modules FindBin" # Used by (host-)libopenssl
-required_perl_modules="$required_perl_modules IPC::Cmd" # Used by (host-)libopenssl
-
-if grep -q ^BR2_PACKAGE_LIBOPENSSL=y $BR2_CONFIG && grep -q ^BR2_s390x=y $BR2_CONFIG ; then
-    required_perl_modules="$required_perl_modules Math::BigInt"
-fi
 
 if grep -q ^BR2_PACKAGE_MOSH=y $BR2_CONFIG ; then
     required_perl_modules="$required_perl_modules diagnostics"

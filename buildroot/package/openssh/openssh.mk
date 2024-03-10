@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OPENSSH_VERSION_MAJOR = 9.6
+OPENSSH_VERSION_MAJOR = 8.9
 OPENSSH_VERSION_MINOR = p1
 OPENSSH_VERSION = $(OPENSSH_VERSION_MAJOR)$(OPENSSH_VERSION_MINOR)
 OPENSSH_CPE_ID_VERSION = $(OPENSSH_VERSION_MAJOR)
@@ -13,7 +13,7 @@ OPENSSH_SITE = http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable
 OPENSSH_LICENSE = BSD-3-Clause, BSD-2-Clause, Public Domain
 OPENSSH_LICENSE_FILES = LICENCE
 
-# 0001-better-detection-of-broken-fzero-call-used-regs.patch
+# patch touching m4/openssh.m4
 OPENSSH_AUTORECONF = YES
 
 OPENSSH_CONF_ENV = \
@@ -37,10 +37,6 @@ OPENSSH_SELINUX_MODULES = ssh
 define OPENSSH_PERMISSIONS
 	/var/empty d 755 root root - - - - -
 endef
-
-ifeq ($(BR2_TOOLCHAIN_HAS_GCC_BUG_110934),y)
-OPENSSH_CONF_OPTS += --without-hardening
-endif
 
 ifeq ($(BR2_TOOLCHAIN_SUPPORTS_PIE),)
 OPENSSH_CONF_OPTS += --without-pie

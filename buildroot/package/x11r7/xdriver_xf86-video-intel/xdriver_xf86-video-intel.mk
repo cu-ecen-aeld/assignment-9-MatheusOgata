@@ -31,17 +31,12 @@ XDRIVER_XF86_VIDEO_INTEL_DEPENDENCIES = \
 	xorgproto \
 	xserver_xorg-server
 
-# DRI support is provided by xserver_xorg-server if libgl is enabled
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
+# X.org server support for DRI depends on a Mesa3D DRI driver
+ifeq ($(BR2_PACKAGE_MESA3D_DRI_DRIVER),y)
 XDRIVER_XF86_VIDEO_INTEL_CONF_OPTS += \
 	--enable-dri2 \
 	--enable-dri3 \
 	--enable-uxa
-else
-XDRIVER_XF86_VIDEO_INTEL_CONF_OPTS += \
-	--disable-dri2 \
-	--disable-dri3 \
-	--disable-uxa
 endif
 
 $(eval $(autotools-package))

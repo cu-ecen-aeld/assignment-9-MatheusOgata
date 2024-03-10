@@ -15,9 +15,7 @@ XDRIVER_XF86_VIDEO_TDFX_DEPENDENCIES = \
 	xorgproto \
 	xserver_xorg-server
 
-ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
-XDRIVER_XF86_VIDEO_TDFX_CONF_OPTS += --enable-dri
-else
+ifeq ($(BR2_PACKAGE_MESA3D_DRI_DRIVER),)
 XDRIVER_XF86_VIDEO_TDFX_CONF_OPTS += --disable-dri
 endif
 

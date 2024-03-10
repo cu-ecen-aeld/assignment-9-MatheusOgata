@@ -17,9 +17,7 @@ else
 PARALLEL_JOBS := $(BR2_JLEVEL)
 endif
 
-# Only build one job at a time, *and* to not randomise goals and
-# prerequisites ordering in make 4.4+
-MAKE1 := $(HOSTMAKE) -j1 $(if $(findstring --shuffle,$(MAKEFLAGS)),--shuffle=none)
+MAKE1 := $(HOSTMAKE) -j1
 override MAKE = $(HOSTMAKE) \
 	$(if $(findstring j,$(filter-out --%,$(MAKEFLAGS))),,-j$(PARALLEL_JOBS))
 
@@ -77,8 +75,17 @@ ABI := $(ABI)hf
 endif
 endif
 
+# For C-SKY abiv1 & abiv2
+ifeq ($(BR2_csky),y)
+ifeq ($(BR2_ck610),y)
+ABI = abiv1
+else
+ABI = abiv2
+endif
+endif
+
 # For FSL PowerPC there's SPE
-ifeq ($(BR2_POWERPC_CPU_HAS_SPE),y)
+ifeq ($(BR2_powerpc_SPE),y)
 ABI = spe
 # MPC8540s are e500v1 with single precision FP
 ifeq ($(BR2_powerpc_8540),y)
@@ -162,14 +169,9 @@ ifeq ($(BR2_FORTIFY_SOURCE_1),y)
 TARGET_HARDENED += -D_FORTIFY_SOURCE=1
 else ifeq ($(BR2_FORTIFY_SOURCE_2),y)
 TARGET_HARDENED += -D_FORTIFY_SOURCE=2
-else ifeq ($(BR2_FORTIFY_SOURCE_3),y)
-TARGET_HARDENED += -D_FORTIFY_SOURCE=3
 endif
 
 TARGET_CPPFLAGS += -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
-ifeq ($(BR2_TIME_BITS_64),y)
-TARGET_CPPFLAGS += -D_TIME_BITS=64
-endif
 TARGET_CFLAGS = $(TARGET_CPPFLAGS) $(TARGET_ABI) $(TARGET_OPTIMIZATION) $(TARGET_DEBUGGING) $(TARGET_HARDENED)
 TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 TARGET_FCFLAGS = $(TARGET_ABI) $(TARGET_OPTIMIZATION) $(TARGET_DEBUGGING)
@@ -263,9 +265,7 @@ export PERL=$(shell which perl)
 # finds this perl module by exporting the proper value for PERL5LIB.
 export PERL5LIB=$(HOST_DIR)/lib/perl
 
-TARGET_MAKE_ENV = \
-	GIT_DIR=. \
-	PATH=$(BR_PATH)
+TARGET_MAKE_ENV = PATH=$(BR_PATH)
 
 TARGET_CONFIGURE_OPTS = \
 	$(TARGET_MAKE_ENV) \
@@ -309,7 +309,6 @@ TARGET_CONFIGURE_OPTS = \
 
 
 HOST_MAKE_ENV = \
-	GIT_DIR=. \
 	PATH=$(BR_PATH) \
 	PKG_CONFIG="$(PKG_CONFIG_HOST_BINARY)" \
 	PKG_CONFIG_SYSROOT_DIR="/" \
@@ -434,8 +433,9 @@ else ifeq ($(BR2_SHARED_STATIC_LIBS),y)
 SHARED_STATIC_LIBS_OPTS = --enable-static --enable-shared
 endif
 
-# Used by our binutils patches.
+ifeq ($(BR2_COMPILER_PARANOID_UNSAFE_PATH),y)
 export BR_COMPILER_PARANOID_UNSAFE_PATH=enabled
+endif
 
 include package/pkg-download.mk
 include package/pkg-autotools.mk

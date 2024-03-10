@@ -4,19 +4,21 @@
 #
 ################################################################################
 
-DOMOTICZ_VERSION = 2024.1
-DOMOTICZ_SITE = $(call github,domoticz,domoticz,$(DOMOTICZ_VERSION))
+DOMOTICZ_VERSION = 2022.1
+DOMOTICZ_SITE = https://github.com/domoticz/domoticz
+DOMOTICZ_SITE_METHOD = git
+DOMOTICZ_GIT_SUBMODULES = YES
 DOMOTICZ_LICENSE = GPL-3.0
 DOMOTICZ_LICENSE_FILES = License.txt
 DOMOTICZ_CPE_ID_VENDOR = domoticz
 DOMOTICZ_DEPENDENCIES = \
 	boost \
 	cereal \
+	fmt \
 	host-pkgconf \
 	jsoncpp \
 	libcurl \
 	lua \
-	minizip-zlib \
 	mosquitto \
 	openssl \
 	sqlite \
@@ -32,10 +34,10 @@ DOMOTICZ_CONF_OPTS += \
 	-DUSE_OPENSSL_STATIC=OFF
 
 # Do not use any built-in libraries which are enabled by default for
-# jsoncpp, fmt, minizip, sqlite and mqtt
+# jsoncpp, fmt, sqlite and mqtt
 DOMOTICZ_CONF_OPTS += \
 	-DUSE_BUILTIN_JSONCPP=OFF \
-	-DUSE_BUILTIN_MINIZIP=OFF \
+	-DUSE_BUILTIN_LIBFMT=OFF \
 	-DUSE_BUILTIN_SQLITE=OFF \
 	-DUSE_BUILTIN_MQTT=OFF
 
@@ -49,6 +51,16 @@ DOMOTICZ_DEPENDENCIES += libusb
 DOMOTICZ_CONF_OPTS += -DWITH_LIBUSB=ON
 else
 DOMOTICZ_CONF_OPTS += -DWITH_LIBUSB=OFF
+endif
+
+ifeq ($(BR2_PACKAGE_OPENZWAVE),y)
+DOMOTICZ_DEPENDENCIES += openzwave
+
+# Due to the dependency on mosquitto, domoticz depends on
+# !BR2_STATIC_LIBS so set USE_STATIC_OPENZWAVE to OFF otherwise
+# domoticz will not find the openzwave library as it searches by
+# default a static library.
+DOMOTICZ_CONF_OPTS += -DUSE_STATIC_OPENZWAVE=OFF
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3),y)

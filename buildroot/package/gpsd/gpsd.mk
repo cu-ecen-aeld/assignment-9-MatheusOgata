@@ -4,11 +4,11 @@
 #
 ################################################################################
 
-GPSD_VERSION = 3.25
+GPSD_VERSION = 3.23.1
 GPSD_SITE = http://download-mirror.savannah.gnu.org/releases/gpsd
 GPSD_LICENSE = BSD-2-Clause
 GPSD_LICENSE_FILES = COPYING
-GPSD_CPE_ID_VALID = YES
+GPSD_CPE_ID_VENDOR = gpsd_project
 GPSD_SELINUX_MODULES = gpsd
 GPSD_INSTALL_STAGING = YES
 
@@ -115,6 +115,15 @@ endif
 ifneq ($(BR2_PACKAGE_GPSD_ITRAX),y)
 GPSD_SCONS_OPTS += itrax=no
 endif
+ifneq ($(BR2_PACKAGE_GPSD_MTK3301),y)
+GPSD_SCONS_OPTS += mtk3301=no
+endif
+ifneq ($(BR2_PACKAGE_GPSD_NMEA),y)
+GPSD_SCONS_OPTS += nmea0183=no
+endif
+ifneq ($(BR2_PACKAGE_GPSD_NTRIP),y)
+GPSD_SCONS_OPTS += ntrip=no
+endif
 ifneq ($(BR2_PACKAGE_GPSD_NAVCOM),y)
 GPSD_SCONS_OPTS += navcom=no
 endif
@@ -158,6 +167,9 @@ endif
 # Features
 ifeq ($(BR2_PACKAGE_GPSD_SQUELCH),y)
 GPSD_SCONS_OPTS += squelch=yes
+endif
+ifneq ($(BR2_PACKAGE_GPSD_OLDSTYLE),y)
+GPSD_SCONS_OPTS += oldstyle=no
 endif
 ifeq ($(BR2_PACKAGE_GPSD_PROFILING),y)
 GPSD_SCONS_OPTS += profiling=yes

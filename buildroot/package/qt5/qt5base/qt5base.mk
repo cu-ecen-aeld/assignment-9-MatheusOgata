@@ -4,11 +4,9 @@
 #
 ################################################################################
 
-QT5BASE_VERSION = da6e958319e95fe564d3b30c931492dd666bfaff
+QT5BASE_VERSION = f31e001a9399e4e620847ea2c3e90749350140ae
 QT5BASE_SITE = $(QT5_SITE)/qtbase/-/archive/$(QT5BASE_VERSION)
 QT5BASE_SOURCE = qtbase-$(QT5BASE_VERSION).tar.bz2
-QT5BASE_CPE_ID_VENDOR = qt
-QT5BASE_CPE_ID_PRODUCT = qt
 
 QT5BASE_DEPENDENCIES = host-pkgconf pcre2 zlib
 QT5BASE_INSTALL_STAGING = YES
@@ -208,28 +206,8 @@ else
 QT5BASE_CONFIGURE_OPTS += -no-opengl
 endif
 
-ifeq ($(BR2_PACKAGE_QT5BASE_VULKAN),y)
-QT5BASE_CONFIGURE_OPTS += -feature-vulkan
-QT5BASE_DEPENDENCIES   += vulkan-headers vulkan-loader
-else
-QT5BASE_CONFIGURE_OPTS += -no-feature-vulkan
-endif
-
 QT5BASE_DEFAULT_QPA = $(call qstrip,$(BR2_PACKAGE_QT5BASE_DEFAULT_QPA))
 QT5BASE_CONFIGURE_OPTS += $(if $(QT5BASE_DEFAULT_QPA),-qpa $(QT5BASE_DEFAULT_QPA))
-
-ifeq ($(BR2_arc),y)
-# In case of -Os (which is default in BR) gcc will use millicode implementation
-# from libgcc. That along with performance degradation may lead to issues during
-# linkage stage. In case of QtWebkit exactly that happens - millicode functions
-# get put way too far from caller functions and so linker fails.
-# To solve that problem we explicitly disable millicode call generation for Qt.
-# Also due to some Qt5 libs being really huge (the best example is QtWebKit)
-# it's good to firce compiler to not assume short or even medium-length calls
-# could be used. I.e. always use long jump instaructions.
-# Otherwise there's a high risk of hitting link-time failures.
-QT5BASE_CFLAGS += -mno-millicode -mlong-calls
-endif
 
 ifeq ($(BR2_PACKAGE_QT5BASE_EGLFS),y)
 QT5BASE_CONFIGURE_OPTS += -eglfs
@@ -327,14 +305,9 @@ endef
 endif
 
 # This allows to use ccache when available
-ifeq ($(BR2_CCACHE),y)
-QT5BASE_CONFIGURE_OPTS += -ccache
-endif
-
-# Ensure HOSTCC/CXX is used
 define QT5BASE_CONFIGURE_HOSTCC
-	$(SED) 's,^QMAKE_CC\s*=.*,QMAKE_CC = $(HOSTCC_NOCCACHE),' $(@D)/mkspecs/common/g++-base.conf
-	$(SED) 's,^QMAKE_CXX\s*=.*,QMAKE_CXX = $(HOSTCXX_NOCCACHE),' $(@D)/mkspecs/common/g++-base.conf
+	$(SED) 's,^QMAKE_CC\s*=.*,QMAKE_CC = $(HOSTCC),' $(@D)/mkspecs/common/g++-base.conf
+	$(SED) 's,^QMAKE_CXX\s*=.*,QMAKE_CXX = $(HOSTCXX),' $(@D)/mkspecs/common/g++-base.conf
 endef
 
 # Must be last so can override all options set by Buildroot

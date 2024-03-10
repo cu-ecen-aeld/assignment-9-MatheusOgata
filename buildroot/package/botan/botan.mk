@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-BOTAN_VERSION = 3.2.0
+BOTAN_VERSION = 2.19.3
 BOTAN_SOURCE = Botan-$(BOTAN_VERSION).tar.xz
 BOTAN_SITE = http://botan.randombit.net/releases
 BOTAN_LICENSE = BSD-2-Clause
 BOTAN_LICENSE_FILES = license.txt
-BOTAN_CPE_ID_VALID = YES
+BOTAN_CPE_ID_VENDOR = botan_project
 
 BOTAN_INSTALL_STAGING = YES
 
@@ -67,11 +67,6 @@ BOTAN_DEPENDENCIES += sqlite
 BOTAN_CONF_OPTS += --with-sqlite
 endif
 
-ifeq ($(BR2_PACKAGE_TROUSERS),y)
-BOTAN_DEPENDENCIES += trousers
-BOTAN_CONF_OPTS += --with-tpm
-endif
-
 ifeq ($(BR2_PACKAGE_XZ),y)
 BOTAN_DEPENDENCIES += xz
 BOTAN_CONF_OPTS += --with-lzma
@@ -87,10 +82,6 @@ BOTAN_CONF_OPTS += --disable-altivec
 endif
 
 ifeq ($(BR2_ARM_CPU_HAS_NEON),)
-BOTAN_CONF_OPTS += --disable-neon
-endif
-
-ifeq ($(BR2_SOFT_FLOAT),y)
 BOTAN_CONF_OPTS += --disable-neon
 endif
 

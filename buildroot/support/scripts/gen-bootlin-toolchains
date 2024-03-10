@@ -56,11 +56,6 @@ arches = {
         'test_options': ['BR2_arm', 'BR2_cortex_a8', 'BR2_ARM_EABIHF'],
         'prefix': 'arm',
     },
-    'armebv7-eabihf': {
-        'conditions': ['BR2_armeb', 'BR2_ARM_CPU_ARMV7A', 'BR2_ARM_EABIHF'],
-        'test_options': ['BR2_armeb', 'BR2_cortex_a8', 'BR2_ARM_EABIHF'],
-        'prefix': 'armeb',
-    },
     'armv7m': {
         'conditions': ['BR2_arm', 'BR2_ARM_CPU_ARMV7M'],
         'test_options': ['BR2_arm', 'BR2_cortex_m4'],
@@ -165,10 +160,6 @@ arches = {
     'riscv64-lp64d': {
         'conditions': ['BR2_riscv', 'BR2_riscv_g', 'BR2_RISCV_64', 'BR2_RISCV_ABI_LP64D', 'BR2_USE_MMU'],
         'prefix': 'riscv64',
-    },
-    's390x-z13': {
-        'conditions': ['BR2_s390x', 'BR2_s390x_z13'],
-        'prefix': 's390x',
     },
     'sh-sh4': {
         'conditions': ['BR2_sh', 'BR2_sh4'],
@@ -326,6 +317,8 @@ class Toolchain:
                 # glibc needs mmu support
                 if "BR2_USE_MMU" not in depends:
                     depends.append("BR2_USE_MMU")
+                # glibc doesn't support static only configuration
+                depends.append("!BR2_STATIC_LIBS")
                 selects.append("BR2_TOOLCHAIN_EXTERNAL_GLIBC")
             elif frag.startswith("BR2_TOOLCHAIN_EXTERNAL_CUSTOM_MUSL"):
                 # musl needs mmu support
@@ -338,8 +331,6 @@ class Toolchain:
                 m = re.match("^BR2_TOOLCHAIN_EXTERNAL_GCC_([0-9_]*)=y$", frag)
                 assert m, "Cannot get gcc version for toolchain %s" % self.fname_prefix
                 selects.append("BR2_TOOLCHAIN_GCC_AT_LEAST_%s" % m[1])
-                # respect the GCC requirement for the selected CPU/arch tuning
-                depends.append("!BR2_ARCH_NEEDS_GCC_AT_LEAST_%s" % str(int(m[1]) + 1))
 
             # kernel headers version
             if frag.startswith("BR2_TOOLCHAIN_EXTERNAL_HEADERS_"):
@@ -501,6 +492,8 @@ def gen_config_in_options(toolchains, fpath):
         f.write("\tbool\n")
         for arch, details in arches.items():
             conditions = details['conditions'].copy()
+            if set([t.libc for t in toolchains if t.arch == arch]) == set(['glibc']):
+                conditions.append("!BR2_STATIC_LIBS")
             f.write("\tdefault y if %s\n" % " && ".join(conditions))
         f.write("\n")
 
