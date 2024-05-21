@@ -1,6 +1,6 @@
 
 
-LDD_VERSION = 55d77b86691de55956cc113e316193713d3263e2
+LDD_VERSION = b6ef04ff98c898b4e844b9a330b7a13faad8646e
 LDD_SITE = git@github.com:cu-ecen-aeld/assignment-7-MatheusOgata.git
 LDD_SITE_METHOD = git
 LDD_GIT_SUBMODULE = YES
