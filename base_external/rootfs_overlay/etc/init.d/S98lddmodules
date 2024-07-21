@@ -7,7 +7,8 @@ echo "Starting init script for Module Loading"
 start-stop-daemon -S -n init -a /bin/scull_load
 start-stop-daemon -S -n init -a /bin/module_load -- hello
 start-stop-daemon -S -n init -a /bin/module_load -- faulty
-start-stop-daemon -S -n init -a /bin/aesdchar_load
+start-stop-daemon -S -n init -a /bin/aesdchar_load -- aesdchar
+#start-stop-daemon -S -n init -a /bin/aesdchar_load
 ;;
 stop)
 echo "Removing user modules"

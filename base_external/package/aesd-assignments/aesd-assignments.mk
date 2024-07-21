@@ -6,7 +6,7 @@
 ##############################################################
 
 #Fill up the contents below in order to reference your assignment 3 git contents
-AESD_ASSIGNMENTS_VERSION = b49ea74a974e77fd34d50dea0a37c8956b55fcfe
+AESD_ASSIGNMENTS_VERSION = 0edc48d1cd752aef371493c89beb89602dc55e45
 # Note: Be sure to reference the *ssh* repository URL here (not https) to work properly
 # with ssh keys and the automated build/test system.
 # Your site should start with git@github.com:
@@ -27,6 +27,4 @@ endef
 define AESD_ASSIGNMENTS_INSTALL_INIT_SYSV
         $(INSTALL) -D -m 0755 $(@D)/server/aesdsocket-start-stop.sh $(TARGET_DIR)/etc/init.d/S99aesdsocket
 endef
-
-
 $(eval $(generic-package))
